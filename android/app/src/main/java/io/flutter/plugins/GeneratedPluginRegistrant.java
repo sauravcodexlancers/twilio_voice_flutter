@@ -2,7 +2,7 @@ package io.flutter.plugins;
 
 import io.flutter.plugin.common.PluginRegistry;
 
-import twilio.voice.flutter.codex.FlutterTwilioPlugin;
+import twilio.voice.flutter.codex.TwilioVoiceFlutterPlugin;
 
 /**
  * Generated file. Do not edit.
@@ -12,7 +12,7 @@ public final class GeneratedPluginRegistrant {
         if (alreadyRegisteredWith(registry)) {
             return;
         }
-        FlutterTwilioPlugin.registerWith(registry.registrarFor("twilio.voice.flutter.codex.FlutterTwilioPlugin"));
+        TwilioVoiceFlutterPlugin.registerWith(registry.registrarFor("twilio.voice.flutter.codex.TwilioVoiceFlutterPlugin"));
     }
 
     private static boolean alreadyRegisteredWith(PluginRegistry registry) {
