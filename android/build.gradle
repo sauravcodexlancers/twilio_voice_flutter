@@ -39,7 +39,7 @@ android {
         sourceCompatibility versions.java
         targetCompatibility versions.java
     }
-    compileSdkVersion 33
+    compileSdkVersion 34
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
