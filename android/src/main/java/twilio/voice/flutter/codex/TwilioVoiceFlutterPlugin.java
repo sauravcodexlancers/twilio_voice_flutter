@@ -36,7 +36,7 @@ public class TwilioVoiceFlutterPlugin implements
         ActivityAware,
         PluginRegistry.NewIntentListener {
 
-    private static final String TAG = "TwilioVoiceFlutterPlugin";
+    private static final String TAG = "TwilioVoiceFlutter";
 
     private Context context;
     private MethodChannel responseChannel;

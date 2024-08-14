@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter_twilio/model/status.dart';
+import '../model/status.dart';
 
 import '../twilio_voice_flutter.dart';
 
