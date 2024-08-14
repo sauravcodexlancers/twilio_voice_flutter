@@ -1,13 +1,14 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter_twilio/flutter_twilio.dart';
 import 'package:flutter_twilio/model/status.dart';
 
-class FlutterTwilioCall extends Equatable {
+import '../twilio_voice_flutter.dart';
+
+class TwilioVoiceFlutterCall extends Equatable {
   final String id;
   final String fromDisplayName;
   final String toDisplayName;
   final bool outgoing;
-  final FlutterTwilioStatus status;
+  final TwilioVoiceFlutterStatus status;
   final bool mute;
   final bool speaker;
 
@@ -15,7 +16,7 @@ class FlutterTwilioCall extends Equatable {
   final String to;
   final String toPhotoURL;
 
-  FlutterTwilioCall({
+  TwilioVoiceFlutterCall({
     required this.id,
     required this.fromDisplayName,
     required this.toDisplayName,
@@ -27,15 +28,15 @@ class FlutterTwilioCall extends Equatable {
     required this.toPhotoURL,
   });
 
-  factory FlutterTwilioCall.fromMap(Map<String, dynamic> data) {
-    return FlutterTwilioCall(
+  factory TwilioVoiceFlutterCall.fromMap(Map<String, dynamic> data) {
+    return TwilioVoiceFlutterCall(
       id: data["id"] ?? "",
       fromDisplayName: data["fromDisplayName"] ?? "",
       toDisplayName: data["toDisplayName"] ?? "",
       outgoing: data["outgoing"] ?? false,
       mute: data["mute"] ?? false,
       speaker: data["speaker"] ?? false,
-      status: FlutterTwilio.getEventType(data["status"] ?? ""),
+      status: TwilioVoiceFlutter.getEventType(data["status"] ?? ""),
       toPhotoURL: data["toPhotoURL"] ?? "",
       to: data["to"] ?? "",
     );

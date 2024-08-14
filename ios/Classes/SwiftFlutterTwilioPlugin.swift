@@ -56,7 +56,7 @@ public class SwiftFlutterTwilioPlugin: NSObject, FlutterPlugin,   NotificationDe
         }
         
         channel = FlutterMethodChannel(
-            name: "flutter_twilio_response",
+            name: "twilio_voice_flutter_response",
             binaryMessenger: controller.binaryMessenger
         )
         
@@ -70,7 +70,7 @@ public class SwiftFlutterTwilioPlugin: NSObject, FlutterPlugin,   NotificationDe
     
     public static func register(with registrar: FlutterPluginRegistrar) {
         let instance = SwiftFlutterTwilioPlugin()
-        let methodChannel = FlutterMethodChannel(name: "flutter_twilio", binaryMessenger: registrar.messenger())
+        let methodChannel = FlutterMethodChannel(name: "twilio_voice_flutter", binaryMessenger: registrar.messenger())
         registrar.addMethodCallDelegate(instance, channel: methodChannel)
     }
     

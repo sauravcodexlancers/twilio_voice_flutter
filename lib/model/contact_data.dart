@@ -1,9 +1,9 @@
-class FlutterTwilioContactData {
+class TwilioVoiceFlutterContactData {
   final String phoneNumber;
   final String displayName;
   final String photoURL;
 
-  FlutterTwilioContactData(
+  TwilioVoiceFlutterContactData(
     this.phoneNumber, {
     this.displayName = "",
     this.photoURL = "",

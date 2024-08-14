@@ -1,4 +1,4 @@
-# flutter_twilio
+# twilio_voice_flutter
 
 Provides an interface to Twilio's Programmable Voice SDK to allow voice-over-IP (VoIP) calling into your Flutter applications.
 This plugin was taken from the original flutter_twilio_voice, as it seems that plugin is no longer maitained, this one is.

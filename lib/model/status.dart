@@ -1,4 +1,4 @@
-enum FlutterTwilioStatus {
+enum TwilioVoiceFlutterStatus {
   connecting,
   disconnected,
   ringing,
