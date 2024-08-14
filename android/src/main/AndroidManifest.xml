@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="federico.amura.flutter_twilio">
+    package="twilio.voice.flutter.codex">
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
@@ -10,7 +10,7 @@
 
     <application>
         <activity
-            android:name="federico.amura.flutter_twilio.BackgroundCallJavaActivity"
+            android:name="twilio.voice.flutter.codex.BackgroundCallJavaActivity"
             android:exported="true"
             android:excludeFromRecents="true"
             android:screenOrientation="portrait"
@@ -28,7 +28,7 @@
         </activity>
 
         <service
-            android:name="federico.amura.flutter_twilio.IncomingCallNotificationService"
+            android:name="twilio.voice.flutter.codex.IncomingCallNotificationService"
             android:enabled="true"
             android:exported="false" />
 

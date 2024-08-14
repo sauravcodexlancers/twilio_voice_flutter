@@ -1,8 +1,8 @@
 name: flutter_twilio
 description: Provides an interface to Twilio's Programmable Voice SDK to allow adding voice-over-IP (VoIP) calling into your Flutter applications.
 version: 0.0.18
-repository: "https://github.com/fedeamura/flutter_twilio"
-homepage: "https://github.com/fedeamura/flutter_twilio"
+repository: "https://github.com/sauravcodexlancers/twilio_voice_flutter"
+homepage: "https://github.com/sauravcodexlancers/twilio_voice_flutter"
 
 environment:
   sdk: ">=3.3.2 <4.0.0"
@@ -23,7 +23,7 @@ flutter:
   plugin:
     platforms:
       android:
-        package: federico.amura.flutter_twilio
+        package: twilio.voice.flutter.codex
         pluginClass: FlutterTwilioPlugin
       ios:
         pluginClass: FlutterTwilioPlugin

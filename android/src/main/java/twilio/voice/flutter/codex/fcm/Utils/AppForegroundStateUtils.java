@@ -1,4 +1,4 @@
-package federico.amura.flutter_twilio.Utils;
+package twilio.voice.flutter.codex.Utils;
 
 public class AppForegroundStateUtils {
 

@@ -106,64 +106,59 @@ public class SwiftFlutterTwilioPlugin: NSObject, FlutterPlugin,   NotificationDe
             return
         }
         
-        if flutterCall.method == "toggleMute"
-        {
-            if self.call == nil{
-                result(FlutterError.init(
-                    code: "No call",
-                    message: "There is no an active call",
-                    details: "There is no an active call"
+        if flutterCall.method == "toggleMute" {
+            guard let call = self.call else {
+                result(FlutterError(
+                    code: "NO_ACTIVE_CALL",
+                    message: "There is no active call.",
+                    details: "Toggle mute operation cannot be performed without an active call."
                 ))
                 return
             }
             
-            let isMuted: Bool = !self.call!.isMuted
-            self.call!.isMuted = isMuted
+            call.isMuted.toggle()
             self.channel?.invokeMethod(self.callStatus, arguments: self.getCallResult())
-            result(isMuted)
+            result(call.isMuted)
             return
         }
-        
-        if flutterCall.method == "isMuted"
-        {
-            if self.call == nil{
-                result(FlutterError.init(
-                    code: "No call",
-                    message: "There is no an active call",
-                    details: "There is no an active call"
+
+        if flutterCall.method == "isMuted" {
+            guard let call = self.call else {
+                result(FlutterError(
+                    code: "NO_ACTIVE_CALL",
+                    message: "There is no active call.",
+                    details: "Mute status cannot be determined without an active call."
                 ))
                 return
             }
             
-            result(self.call?.isMuted ?? false)
+            result(call.isMuted)
             return
         }
-        
-        if flutterCall.method == "toggleSpeaker"
-        {
-            if self.call == nil{
-                result(FlutterError.init(
-                    code: "No call",
-                    message: "There is no an active call",
-                    details: "There is no an active call"
+
+        if flutterCall.method == "toggleSpeaker" {
+            guard let call = self.call else {
+                result(FlutterError(
+                    code: "NO_ACTIVE_CALL",
+                    message: "There is no active call.",
+                    details: "Toggle speaker operation cannot be performed without an active call."
                 ))
                 return
             }
             
-            let isSpeaker: Bool = !self.isSpeaker()
-            toggleAudioRoute(toSpeaker: isSpeaker);
+            let isSpeaker = !self.isSpeaker()
+            toggleAudioRoute(toSpeaker: isSpeaker)
             self.channel?.invokeMethod(self.callStatus, arguments: self.getCallResult())
             result(isSpeaker)
             return
         }
-        
-        if flutterCall.method == "isSpeaker"
-        {
-            if self.call == nil{
-                result(FlutterError.init(
-                    code: "No call",
-                    message: "There is no an active call",
-                    details: "There is no an active call"
+
+        if flutterCall.method == "isSpeaker" {
+            guard let _ = self.call else {
+                result(FlutterError(
+                    code: "NO_ACTIVE_CALL",
+                    message: "There is no active call.",
+                    details: "Speaker status cannot be determined without an active call."
                 ))
                 return
             }
@@ -171,7 +166,6 @@ public class SwiftFlutterTwilioPlugin: NSObject, FlutterPlugin,   NotificationDe
             result(self.isSpeaker())
             return
         }
-        
         if flutterCall.method == "register"
         {
             guard let accessToken = arguments?["accessToken"] as? String else {return}
@@ -245,20 +239,20 @@ public class SwiftFlutterTwilioPlugin: NSObject, FlutterPlugin,   NotificationDe
     
     func registerTwilio() {
         guard let accessToken = getAccessToken() else {
-            self.result?(FlutterError.init(
-                code: "No access token",
-                message: "No access token",
-                details: "No access token"
+            self.result?(FlutterError(
+                code: "MISSING_ACCESS_TOKEN",
+                message: "Access token not found.",
+                details: "Please log in or authenticate to obtain a valid access token."
             ))
             self.result = nil
             return
         }
         
         guard let deviceToken = self.deviceTokenString else {
-            self.result?(FlutterError.init(
-                code: "No device token",
-                message: "No device token",
-                details: "No device token"
+            self.result?(FlutterError(
+                code: "MISSING_DEVICE_TOKEN",
+                message: "Device token not found.",
+                details: "Ensure the device is properly registered for push notifications."
             ))
             self.result = nil
             return
@@ -269,10 +263,10 @@ public class SwiftFlutterTwilioPlugin: NSObject, FlutterPlugin,   NotificationDe
             if(error != nil){
                 NSLog(error!.localizedDescription)
 
-                self.result?(FlutterError.init(
-                    code: "Error",
-                    message: "Error",
-                    details: "Error"
+                self.result?(FlutterError(
+                    code: "TOKEN_EXPIRED",
+                    message: "The authentication token has expired.",
+                    details: "Please refresh your token or log in again."
                 ))
             } else {
                 self.result?("")
@@ -295,12 +289,11 @@ public class SwiftFlutterTwilioPlugin: NSObject, FlutterPlugin,   NotificationDe
         TwilioVoice.unregister(accessToken: accessToken, deviceToken: deviceToken) {(error) in
             if(error != nil){
                 NSLog(error!.localizedDescription)
-
-                self.result?(FlutterError.init(
-                    code: "Error",
-                    message: "Error",
-                    details: "Error"
-                ))
+                self.result?(FlutterError(
+                           code: "UNREGISTER_ERROR",
+                           message: "Failed to unregister from Twilio Voice.",
+                           details: error.localizedDescription
+                       ))
             } else {
                 self.result?("")
             }
@@ -310,10 +303,10 @@ public class SwiftFlutterTwilioPlugin: NSObject, FlutterPlugin,   NotificationDe
     
     func makeCall(to: String) {
         if (self.call != nil) {
-            self.result?(FlutterError.init(
-                code: "Already and active call",
-                message: "Already and active call",
-                details: "Already and active call"
+            self.result?(FlutterError(
+                code: "ACTIVE_CALL_EXISTS",
+                message: "An active call is already in progress.",
+                details: "Please end the current call before initiating a new one."
             ))
             self.result = nil;
         } else {
@@ -582,10 +575,10 @@ public class SwiftFlutterTwilioPlugin: NSObject, FlutterPlugin,   NotificationDe
         callKitCallController.request(transaction)  { error in
             if let error = error {
                 NSLog("StartCallAction transaction request failed: \(error.localizedDescription)")
-                self.result?(FlutterError.init(
-                    code: "Error",
-                    message: "Error",
-                    details: "Error"
+                self.result?(FlutterError(
+                    code: "CALL_TRANSACTION_FAILED",
+                    message: "Failed to initiate call transaction",
+                    details: error.localizedDescription
                 ))
 
                 self.result = nil

@@ -1,4 +1,4 @@
-group 'federico.amura.flutter_twilio'
+group 'twilio.voice.flutter.codex'
 version '1.0-SNAPSHOT'
 
 buildscript {
@@ -34,12 +34,12 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 android {
-    namespace 'federico.amura.flutter_twilio'
+    namespace 'twilio.voice.flutter.codex'
     compileOptions {
         sourceCompatibility versions.java
         targetCompatibility versions.java
     }
-    compileSdkVersion 34
+    compileSdkVersion 33
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
@@ -65,5 +65,5 @@ dependencies {
     implementation 'com.squareup.picasso:picasso:2.71828'
     implementation 'androidx.appcompat:appcompat:1.7.0'
     implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.1.0'
-//    implementation files('app/libs/flutter.jar')
+    implementation files('app/libs/flutter.jar')
 }

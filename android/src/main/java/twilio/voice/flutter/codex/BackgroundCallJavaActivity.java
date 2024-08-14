@@ -1,4 +1,4 @@
-package federico.amura.flutter_twilio;
+package twilio.voice.flutter.codex;
 
 import android.app.KeyguardManager;
 import android.content.BroadcastReceiver;
@@ -35,14 +35,15 @@ import com.twilio.voice.Call;
 import com.twilio.voice.CallException;
 import com.twilio.voice.CallInvite;
 
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import federico.amura.flutter_twilio.Utils.PreferencesUtils;
-import federico.amura.flutter_twilio.Utils.TwilioConstants;
-import federico.amura.flutter_twilio.Utils.TwilioUtils;
+import twilio.voice.flutter.codex.Utils.PreferencesUtils;
+import twilio.voice.flutter.codex.Utils.TwilioConstants;
+import twilio.voice.flutter.codex.Utils.TwilioUtils;
 
 public class BackgroundCallJavaActivity extends AppCompatActivity implements SensorEventListener {
 
@@ -211,15 +212,34 @@ public class BackgroundCallJavaActivity extends AppCompatActivity implements Sen
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(TwilioConstants.ACTION_CANCEL_CALL);
         intentFilter.addAction(TwilioConstants.ACTION_REJECT);
+
         this.customBroadCastReceiver = new CustomBroadCastReceiver(this);
-        LocalBroadcastManager.getInstance(this).registerReceiver(customBroadCastReceiver, intentFilter);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            try {
+                Method method = Context.class.getMethod("registerReceiver", BroadcastReceiver.class, IntentFilter.class, int.class);
+                method.invoke(this, customBroadCastReceiver, intentFilter, Context.RECEIVER_NOT_EXPORTED);
+            } catch (Exception e) {
+                Log.e(TAG, "Exception occurred during registerReceiver: ", e);
+                // Fallback in case reflection fails (though unlikely)
+                registerReceiver(customBroadCastReceiver, intentFilter, Context.RECEIVER_NOT_EXPORTED);
+            }
+        } else {
+            // For older versions, register without the flag
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                registerReceiver(customBroadCastReceiver, intentFilter, Context.RECEIVER_NOT_EXPORTED);
+            }
+        }
     }
 
     private void unregisterReceiver() {
         if (!broadcastReceiverRegistered) return;
+
         this.broadcastReceiverRegistered = false;
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(customBroadCastReceiver);
+        unregisterReceiver(customBroadCastReceiver);
     }
+
+
 
     private void handleIntent(Intent intent) {
         if (intent == null || intent.getAction() == null) {
@@ -285,7 +305,7 @@ public class BackgroundCallJavaActivity extends AppCompatActivity implements Sen
         try {
             TwilioUtils.getInstance(this).acceptInvite(this.callInvite, getListener());
         } catch (Exception exception) {
-            exception.printStackTrace();
+            Log.e(TAG, "Exception occurred during acceptCall: ", exception);
             this.close();
         }
     }
@@ -302,7 +322,7 @@ public class BackgroundCallJavaActivity extends AppCompatActivity implements Sen
         try {
             this.callInvite.reject(this);
         } catch (Exception exception) {
-            exception.printStackTrace();
+            Log.e(TAG, "Exception occurred during rejectCall: ", exception);
         }
 
         this.close();
@@ -313,7 +333,8 @@ public class BackgroundCallJavaActivity extends AppCompatActivity implements Sen
         try {
             TwilioUtils.getInstance(this).disconnect();
         } catch (Exception exception) {
-            exception.printStackTrace();
+            Log.e(TAG, "Exception occurred during hangUp: ", exception);
+
         }
 
         this.close();
@@ -323,7 +344,8 @@ public class BackgroundCallJavaActivity extends AppCompatActivity implements Sen
         try {
             TwilioUtils.getInstance(this).disconnect();
         } catch (Exception exception) {
-            exception.printStackTrace();
+            Log.e(TAG, "Exception occurred during onCallCanceled: ", exception);
+
         }
 
         this.close();
@@ -335,7 +357,8 @@ public class BackgroundCallJavaActivity extends AppCompatActivity implements Sen
             applyColorToButton(this.btnMute, muted);
             this.btnMute.setImageResource(muted ? R.drawable.ic_mic_off : R.drawable.ic_mic);
         } catch (Exception exception) {
-            exception.printStackTrace();
+            Log.e(TAG, "Exception occurred during toggleMute: ", exception);
+
         }
     }
 
@@ -344,7 +367,8 @@ public class BackgroundCallJavaActivity extends AppCompatActivity implements Sen
             boolean speaker = TwilioUtils.getInstance(this).toggleSpeaker();
             applyColorToButton(this.btnSpeaker, speaker);
         } catch (Exception exception) {
-            exception.printStackTrace();
+            Log.e(TAG, "Exception occurred during toggleSpeaker: ", exception);
+
         }
     }
 
@@ -381,7 +405,7 @@ public class BackgroundCallJavaActivity extends AppCompatActivity implements Sen
         HashMap<String, Object> call = TwilioUtils.getInstance(this).getCallDetails();
 
         String status = (String) call.get("status");
-        if (status != null && !status.trim().equals("")) {
+        if (status != null && !status.trim().isEmpty()) {
             switch (status) {
                 case "callRinging": {
                     this.textCallStatus.setVisibility(View.VISIBLE);
@@ -495,7 +519,7 @@ public class BackgroundCallJavaActivity extends AppCompatActivity implements Sen
         }
 
         timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() {
+        timer.schedule(new TimerTask() {
             @Override
             public void run() {
                 seconds += 1;

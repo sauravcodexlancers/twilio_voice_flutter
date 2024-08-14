@@ -1,4 +1,4 @@
-package federico.amura.flutter_twilio.Utils;
+package twilio.voice.flutter.codex.Utils;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
@@ -20,9 +20,9 @@ import com.twilio.voice.CallInvite;
 
 import java.util.Map;
 
-import federico.amura.flutter_twilio.BackgroundCallJavaActivity;
-import federico.amura.flutter_twilio.IncomingCallNotificationService;
-import federico.amura.flutter_twilio.R;
+import twilio.voice.flutter.codex.BackgroundCallJavaActivity;
+import twilio.voice.flutter.codex.IncomingCallNotificationService;
+import twilio.voice.flutter.codex.R;
 
 public class NotificationUtils {
 

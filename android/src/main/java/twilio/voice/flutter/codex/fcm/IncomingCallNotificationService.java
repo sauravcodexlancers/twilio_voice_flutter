@@ -1,4 +1,4 @@
-package federico.amura.flutter_twilio;
+package twilio.voice.flutter.codex;
 
 import android.app.ActivityManager;
 import android.app.KeyguardManager;
@@ -16,11 +16,11 @@ import com.twilio.voice.CancelledCallInvite;
 
 import java.util.List;
 
-import federico.amura.flutter_twilio.Utils.AppForegroundStateUtils;
-import federico.amura.flutter_twilio.Utils.NotificationUtils;
-import federico.amura.flutter_twilio.Utils.SoundUtils;
-import federico.amura.flutter_twilio.Utils.TwilioConstants;
-import federico.amura.flutter_twilio.Utils.TwilioUtils;
+import twilio.voice.flutter.codex.Utils.AppForegroundStateUtils;
+import twilio.voice.flutter.codex.Utils.NotificationUtils;
+import twilio.voice.flutter.codex.Utils.SoundUtils;
+import twilio.voice.flutter.codex.Utils.TwilioConstants;
+import twilio.voice.flutter.codex.Utils.TwilioUtils;
 
 public class IncomingCallNotificationService extends Service {
 
@@ -106,7 +106,7 @@ public class IncomingCallNotificationService extends Service {
         try {
             TwilioUtils.getInstance(this).rejectInvite(callInvite);
         } catch (Exception exception) {
-            exception.printStackTrace();
+            Log.e(TAG, "Exception occurred during reject: ", exception);
         }
     }
 

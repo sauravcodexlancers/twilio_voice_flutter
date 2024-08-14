@@ -21,7 +21,7 @@ Register in your `AndroidManifest.xml` the service in charge of displaying incom
 <Application>
   .....
   <service
-      android:name="federico.amura.flutter_twilio.fcm.VoiceFirebaseMessagingService"
+      android:name="twilio.voice.flutter.codex.fcm.VoiceFirebaseMessagingService"
       android:stopWithTask="false">
       <intent-filter>
           <action android:name="com.google.firebase.MESSAGING_EVENT" />

@@ -1,4 +1,4 @@
-package federico.amura.flutter_twilio;
+package twilio.voice.flutter.codex;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -8,7 +8,6 @@ import android.os.Build;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.twilio.voice.Call;
 import com.twilio.voice.CallException;
@@ -17,11 +16,11 @@ import com.twilio.voice.CallInvite;
 import java.util.Map;
 import java.util.Set;
 
-import federico.amura.flutter_twilio.Utils.AppForegroundStateUtils;
-import federico.amura.flutter_twilio.Utils.PreferencesUtils;
-import federico.amura.flutter_twilio.Utils.TwilioConstants;
-import federico.amura.flutter_twilio.Utils.TwilioRegistrationListener;
-import federico.amura.flutter_twilio.Utils.TwilioUtils;
+import twilio.voice.flutter.codex.Utils.AppForegroundStateUtils;
+import twilio.voice.flutter.codex.Utils.PreferencesUtils;
+import twilio.voice.flutter.codex.Utils.TwilioConstants;
+import twilio.voice.flutter.codex.Utils.TwilioRegistrationListener;
+import twilio.voice.flutter.codex.Utils.TwilioUtils;
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
@@ -79,6 +78,7 @@ public class FlutterTwilioPlugin implements
 //            LocalBroadcastManager.getInstance(this.context).unregisterReceiver(this.broadcastReceiver);
         }
     }
+
 
     @Override
     public void onAttachedToActivity(ActivityPluginBinding activityPluginBinding) {
@@ -145,12 +145,12 @@ public class FlutterTwilioPlugin implements
 
                         @Override
                         public void onError() {
-                            result.error("", "", "");
+                            result.error("CALL_TRANSACTION_FAILED", "Failed to register with Twilio", "An error occurred while setting up the registration.");
                         }
                     });
                 } catch (Exception exception) {
-                    exception.printStackTrace();
-                    result.error("", "", "");
+                    Log.e(TAG, "Exception occurred during register: ", exception);
+                    result.error("ERROR", "Exception occurred during registration", exception.getMessage());
                 }
             }
             break;
@@ -158,11 +158,11 @@ public class FlutterTwilioPlugin implements
             case "unregister": {
                 try {
                     twilioUtils.unregister();
+                    result.success("");
                 } catch (Exception exception) {
-                    exception.printStackTrace();
+                    Log.e(TAG, "Exception occurred during unregister: ", exception);
+                    result.error("UNREGISTER_ERROR", "Failed to unregister from Twilio Voice", exception.getMessage());
                 }
-
-                result.success("");
             }
             break;
 
@@ -174,8 +174,8 @@ public class FlutterTwilioPlugin implements
                     responseChannel.invokeMethod("callConnecting", twilioUtils.getCallDetails());
                     result.success(twilioUtils.getCallDetails());
                 } catch (Exception exception) {
-                    exception.printStackTrace();
-                    result.error("", "", "");
+                    Log.e(TAG, "Exception occurred during makeCall: ", exception);
+                    result.error("CALL_TRANSACTION_FAILED", "Failed to make a call", exception.getMessage());
                 }
             }
             break;
@@ -186,8 +186,8 @@ public class FlutterTwilioPlugin implements
                     responseChannel.invokeMethod(twilioUtils.getCallStatus(), twilioUtils.getCallDetails());
                     result.success(isMuted);
                 } catch (Exception exception) {
-                    exception.printStackTrace();
-                    result.error("", "", "");
+                    Log.e(TAG, "Exception occurred during toggleMute: ", exception);
+                    result.error("ERROR", "Failed to toggle mute", exception.getMessage());
                 }
             }
             break;
@@ -197,8 +197,8 @@ public class FlutterTwilioPlugin implements
                     boolean isMuted = twilioUtils.isMuted();
                     result.success(isMuted);
                 } catch (Exception exception) {
-                    exception.printStackTrace();
-                    result.error("", "", "");
+                    Log.e(TAG, "Exception occurred during isMuted: ", exception);
+                    result.error("ERROR", "Failed to check mute status", exception.getMessage());
                 }
             }
             break;
@@ -209,8 +209,8 @@ public class FlutterTwilioPlugin implements
                     responseChannel.invokeMethod(twilioUtils.getCallStatus(), twilioUtils.getCallDetails());
                     result.success(isSpeaker);
                 } catch (Exception exception) {
-                    exception.printStackTrace();
-                    result.error("", "", "");
+                    Log.e(TAG, "Exception occurred during toggleSpeaker: ", exception);
+                    result.error("ERROR", "Failed to toggle speaker", exception.getMessage());
                 }
             }
             break;
@@ -221,8 +221,8 @@ public class FlutterTwilioPlugin implements
                     twilioUtils.sendDigits(digits);
                     result.success("");
                 } catch (Exception exception) {
-                    exception.printStackTrace();
-                    result.error("", "", "");
+                    Log.e(TAG, "Exception occurred during sendDigits: ", exception);
+                    result.error("DIGITS_ERROR", "Failed to send digits", exception.getMessage());
                 }
             }
             break;
@@ -232,8 +232,8 @@ public class FlutterTwilioPlugin implements
                     boolean isSpeaker = twilioUtils.isSpeaker();
                     result.success(isSpeaker);
                 } catch (Exception exception) {
-                    exception.printStackTrace();
-                    result.error("", "", "");
+                    Log.e(TAG, "Exception occurred during isSpeaker: ", exception);
+                    result.error("ERROR", "Failed to check speaker status", exception.getMessage());
                 }
             }
             break;
@@ -243,15 +243,15 @@ public class FlutterTwilioPlugin implements
                     twilioUtils.disconnect();
                     result.success("");
                 } catch (Exception exception) {
-                    exception.printStackTrace();
-                    result.error("", "", "");
+                    Log.e(TAG, "Exception occurred during hangUp: ", exception);
+                    result.error("CALL_TRANSACTION_FAILED", "Failed to hang up the call", exception.getMessage());
                 }
             }
             break;
 
             case "activeCall": {
                 if (twilioUtils.getActiveCall() == null) {
-                    result.success("");
+                    result.error("NO_ACTIVE_CALL", "There is no active call.", "Operation cannot be performed without an active call.");
                 } else {
                     result.success(twilioUtils.getCallDetails());
                 }
@@ -259,13 +259,17 @@ public class FlutterTwilioPlugin implements
             break;
 
             case "setContactData": {
-                Map<String, Object> data = call.argument("contacts");
-                String defaultDisplayName = call.argument("defaultDisplayName");
-                PreferencesUtils.getInstance(this.context).setContacts(data, defaultDisplayName);
-                result.success("");
+                try {
+                    Map<String, Object> data = call.argument("contacts");
+                    String defaultDisplayName = call.argument("defaultDisplayName");
+                    PreferencesUtils.getInstance(this.context).setContacts(data, defaultDisplayName);
+                    result.success("");
+                } catch (Exception exception) {
+                    Log.e(TAG, "Exception occurred during setContactData: ", exception);
+                    result.error("CONTACT_DATA_ERROR", "Failed to set contact data", exception.getMessage());
+                }
             }
             break;
-
 
             case "setCallStyle": {
                 try {
@@ -303,7 +307,6 @@ public class FlutterTwilioPlugin implements
                         preferencesUtils.clearCallButtonIconColor();
                     }
 
-
                     // Button focus
                     if (call.argument("buttonFocusColor") != null) {
                         String color = call.argument("buttonFocusColor");
@@ -322,21 +325,27 @@ public class FlutterTwilioPlugin implements
 
                     result.success("");
                 } catch (Exception exception) {
-                    exception.printStackTrace();
-                    result.error("", "", "");
+                    Log.e(TAG, "Exception occurred during setCallStyle: ", exception);
+
+                    result.error("CALL_STYLE_ERROR", "Failed to set call style", exception.getMessage());
                 }
             }
             break;
 
             case "resetCallStyle": {
-                final PreferencesUtils preferencesUtils = PreferencesUtils.getInstance(this.context);
-                preferencesUtils.clearCallBackgroundColor();
-                preferencesUtils.clearCallTextColor();
-                preferencesUtils.clearCallButtonColor();
-                preferencesUtils.clearCallButtonIconColor();
-                preferencesUtils.clearCallButtonFocusColor();
-                preferencesUtils.clearCallButtonFocusIconColor();
-                result.success("");
+                try {
+                    final PreferencesUtils preferencesUtils = PreferencesUtils.getInstance(this.context);
+                    preferencesUtils.clearCallBackgroundColor();
+                    preferencesUtils.clearCallTextColor();
+                    preferencesUtils.clearCallButtonColor();
+                    preferencesUtils.clearCallButtonIconColor();
+                    preferencesUtils.clearCallButtonFocusColor();
+                    preferencesUtils.clearCallButtonFocusIconColor();
+                    result.success("");
+                } catch (Exception exception) {
+                    Log.e(TAG, "Exception occurred during resetCallStyle: ", exception);
+                    result.error("RESET_CALL_STYLE_ERROR", "Failed to reset call style", exception.getMessage());
+                }
             }
             break;
 
@@ -345,12 +354,14 @@ public class FlutterTwilioPlugin implements
                     AppForegroundStateUtils.getInstance().setForeground(call.argument("foreground"));
                     result.success("");
                 } catch (Exception exception) {
-                    exception.printStackTrace();
-                    result.error("", "", "");
+                    Log.e(TAG, "Exception occurred during setForeground: ", exception);
+                    result.error("FOREGROUND_ERROR", "Failed to set foreground state", exception.getMessage());
                 }
             }
             break;
         }
+
+
     }
 
     @Override
@@ -368,7 +379,7 @@ public class FlutterTwilioPlugin implements
             t.acceptInvite(callInvite, getCallListener());
             responseChannel.invokeMethod("callConnecting", t.getCallDetails());
         } catch (Exception exception) {
-            exception.printStackTrace();
+            Log.e(TAG, "Exception occurred during answer: ", exception);
         }
     }
 

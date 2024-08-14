@@ -1,4 +1,4 @@
-package federico.amura.flutter_twilio.Utils;
+package twilio.voice.flutter.codex.Utils;
 
 import static android.content.Context.AUDIO_SERVICE;
 
@@ -9,7 +9,7 @@ import android.os.Build;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 
-import federico.amura.flutter_twilio.R;
+import twilio.voice.flutter.codex.R;
 
 public class SoundUtils {
 
