@@ -3,6 +3,6 @@
 
 @implementation TwilioVoiceFlutterPlugin
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
-  [TwilioVoiceFlutterPlugin registerWithRegistrar:registrar];
+    [TwilioVoiceFlutterPlugin registerWithRegistrar:registrar];
 }
 @end
