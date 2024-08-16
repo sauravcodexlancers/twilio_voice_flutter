@@ -150,7 +150,7 @@ public class TwilioVoiceFlutterPlugin implements
                     });
                 } catch (Exception exception) {
                     Log.e(TAG, "Exception occurred during register: ", exception);
-                    result.error("ERROR", "Exception occurred during registration", exception.getMessage());
+                    result.error("TOKEN_EXPIRED", "Exception occurred during registration", exception.getMessage());
                 }
             }
             break;
@@ -175,7 +175,7 @@ public class TwilioVoiceFlutterPlugin implements
                     result.success(twilioUtils.getCallDetails());
                 } catch (Exception exception) {
                     Log.e(TAG, "Exception occurred during makeCall: ", exception);
-                    result.error("CALL_TRANSACTION_FAILED", "Failed to make a call", exception.getMessage());
+                    result.error("ACTIVE_CALL_EXISTS", "Failed to make a call", exception.getMessage());
                 }
             }
             break;
@@ -187,7 +187,7 @@ public class TwilioVoiceFlutterPlugin implements
                     result.success(isMuted);
                 } catch (Exception exception) {
                     Log.e(TAG, "Exception occurred during toggleMute: ", exception);
-                    result.error("ERROR", "Failed to toggle mute", exception.getMessage());
+                    result.error("NO_ACTIVE_CALL", "There is no active call.", exception.getMessage());
                 }
             }
             break;
@@ -198,7 +198,7 @@ public class TwilioVoiceFlutterPlugin implements
                     result.success(isMuted);
                 } catch (Exception exception) {
                     Log.e(TAG, "Exception occurred during isMuted: ", exception);
-                    result.error("ERROR", "Failed to check mute status", exception.getMessage());
+                    result.error("NO_ACTIVE_CALL", "There is no active call.", exception.getMessage());
                 }
             }
             break;
@@ -210,7 +210,7 @@ public class TwilioVoiceFlutterPlugin implements
                     result.success(isSpeaker);
                 } catch (Exception exception) {
                     Log.e(TAG, "Exception occurred during toggleSpeaker: ", exception);
-                    result.error("ERROR", "Failed to toggle speaker", exception.getMessage());
+                    result.error("NO_ACTIVE_CALL", "There is no active call.", exception.getMessage());
                 }
             }
             break;
@@ -233,7 +233,7 @@ public class TwilioVoiceFlutterPlugin implements
                     result.success(isSpeaker);
                 } catch (Exception exception) {
                     Log.e(TAG, "Exception occurred during isSpeaker: ", exception);
-                    result.error("ERROR", "Failed to check speaker status", exception.getMessage());
+                    result.error("NO_ACTIVE_CALL", "There is no active call.", exception.getMessage());
                 }
             }
             break;

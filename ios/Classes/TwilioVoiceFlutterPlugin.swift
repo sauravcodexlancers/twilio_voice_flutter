@@ -5,7 +5,7 @@ import PushKit
 import TwilioVoice
 import CallKit
 
-public class SwiftFlutterTwilioPlugin: NSObject, FlutterPlugin,   NotificationDelegate, AVAudioPlayerDelegate {
+public class TwilioVoiceFlutterPlugin: NSObject, FlutterPlugin,   NotificationDelegate, AVAudioPlayerDelegate {
         
     var deviceTokenString: Data?
     var callTo: String = ""
