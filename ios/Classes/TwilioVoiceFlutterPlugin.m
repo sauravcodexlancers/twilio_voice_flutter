@@ -1,8 +1,8 @@
 #import TwilioVoiceFlutterPlugin.h
-#import <flutter_twilio/flutter_twilio-Swift.h>
+#import <twilio_voice_flutter/twilio_voice_flutter-Swift.h>
 
 @implementation TwilioVoiceFlutterPlugin
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
-  [SwiftFlutterTwilioPlugin registerWithRegistrar:registrar];
+  [TwilioVoiceFlutterPlugin registerWithRegistrar:registrar];
 }
 @end

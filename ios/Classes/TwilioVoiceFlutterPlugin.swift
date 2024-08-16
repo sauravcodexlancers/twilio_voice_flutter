@@ -69,7 +69,7 @@ public class TwilioVoiceFlutterPlugin: NSObject, FlutterPlugin,   NotificationDe
     
     
     public static func register(with registrar: FlutterPluginRegistrar) {
-        let instance = SwiftFlutterTwilioPlugin()
+        let instance = TwilioVoiceFlutterPlugin()
         let methodChannel = FlutterMethodChannel(name: "twilio_voice_flutter", binaryMessenger: registrar.messenger())
         registrar.addMethodCallDelegate(instance, channel: methodChannel)
     }
@@ -702,7 +702,7 @@ public class TwilioVoiceFlutterPlugin: NSObject, FlutterPlugin,   NotificationDe
 
 
 // MARK: PKPushRegistryDelegate
-extension SwiftFlutterTwilioPlugin : PKPushRegistryDelegate {
+extension TwilioVoiceFlutterPlugin : PKPushRegistryDelegate {
     
     public func pushRegistry(_ registry: PKPushRegistry, didUpdate credentials: PKPushCredentials, for type: PKPushType) {
         NSLog("pushRegistry:didUpdatePushCredentials:forType:")
@@ -770,7 +770,7 @@ extension SwiftFlutterTwilioPlugin : PKPushRegistryDelegate {
  Call provider delegate
  // MARK: CXProviderDelegate
  */
-extension SwiftFlutterTwilioPlugin : CXProviderDelegate {
+extension TwilioVoiceFlutterPlugin : CXProviderDelegate {
     
     public func providerDidReset(_ provider: CXProvider) {
         NSLog("providerDidReset:")
@@ -860,7 +860,7 @@ extension SwiftFlutterTwilioPlugin : CXProviderDelegate {
  Call state delegate
  // MARK: TVOCallDelegate
  */
-extension SwiftFlutterTwilioPlugin : CallDelegate {
+extension TwilioVoiceFlutterPlugin : CallDelegate {
     
     public func callDidStartRinging(call: Call) {
         NSLog("callDidStartRinging:")
