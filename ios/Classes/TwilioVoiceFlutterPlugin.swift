@@ -259,7 +259,7 @@ public class TwilioVoiceFlutterPlugin: NSObject, FlutterPlugin,   NotificationDe
         }
         
         
-        TwilioVoice.register(accessToken: accessToken, deviceToken: deviceToken) { (error) in
+        TwilioVoiceSDK.register(accessToken: accessToken, deviceToken: deviceToken) { (error) in
             if(error != nil){
                 NSLog(error!.localizedDescription)
 
@@ -274,25 +274,25 @@ public class TwilioVoiceFlutterPlugin: NSObject, FlutterPlugin,   NotificationDe
             self.result = nil
         }
     }
-    
+
     func unregisterTwilio(){
         guard let accessToken = getAccessToken() else {
             return
         }
-        
+
         guard let deviceToken = self.deviceTokenString else {
             return
         }
-        
-        
+
+
         self.removeAccessToken()
-        TwilioVoice.unregister(accessToken: accessToken, deviceToken: deviceToken) {(error) in
+        TwilioVoiceSDK.unregister(accessToken: accessToken, deviceToken: deviceToken) {(error) in
             if(error != nil){
                 NSLog(error!.localizedDescription)
                 self.result?(FlutterError(
                            code: "UNREGISTER_ERROR",
                            message: "Failed to unregister from Twilio Voice.",
-                           details: error.localizedDescription
+                           details: error?.localizedDescription
                        ))
             } else {
                 self.result?("")
@@ -300,7 +300,7 @@ public class TwilioVoiceFlutterPlugin: NSObject, FlutterPlugin,   NotificationDe
             self.result = nil
         }
     }
-    
+
     func makeCall(to: String) {
         if (self.call != nil) {
             self.result?(FlutterError(
@@ -314,8 +314,8 @@ public class TwilioVoiceFlutterPlugin: NSObject, FlutterPlugin,   NotificationDe
             self.performStartCallAction(uuid: uuid)
         }
     }
-    
-    
+
+
     func storeContactData(data: NSDictionary, defaultDisplayName: String)->Void{
         UserDefaults.standard.set(defaultDisplayName, forKey: "_defaultDisplayName")
 
@@ -326,7 +326,7 @@ public class TwilioVoiceFlutterPlugin: NSObject, FlutterPlugin,   NotificationDe
             UserDefaults.standard.set(displayName + ";" + photoURL, forKey: phoneNumber as? String ?? "")
         }
     }
-    
+
     func hasContactDisplayName(phoneNumber: String) -> Bool{
         if let value = UserDefaults.standard.string(forKey: phoneNumber) {
             let parts = value.components(separatedBy: ";")
@@ -346,11 +346,11 @@ public class TwilioVoiceFlutterPlugin: NSObject, FlutterPlugin,   NotificationDe
             return false
         }
     }
-    
-    
+
+
     func getContactDisplayName(phoneNumber: String)-> String{
         let defaultDisplayName = UserDefaults.standard.string(forKey: "_defaultDisplayName") ?? ""
-        
+
         if let value = UserDefaults.standard.string(forKey: phoneNumber) {
             let parts = value.components(separatedBy: ";")
             if parts.count == 2 {
@@ -364,13 +364,13 @@ public class TwilioVoiceFlutterPlugin: NSObject, FlutterPlugin,   NotificationDe
                 NSLog("Wrong contact name saved " + value + ". Parts length: " + parts.count.description + " for number " + phoneNumber)
                 return defaultDisplayName
             }
-            
+
         } else {
             NSLog("No contact name saved for number " + phoneNumber)
             return defaultDisplayName
         }
     }
-    
+
     func getContactPhotoURL(phoneNumber: String)-> String{
         if let value = UserDefaults.standard.string(forKey: phoneNumber) {
             let parts = value.components(separatedBy: ";")
@@ -389,15 +389,15 @@ public class TwilioVoiceFlutterPlugin: NSObject, FlutterPlugin,   NotificationDe
     func storeAccessToken(token: String) -> Void{
         UserDefaults.standard.set(token, forKey: "_accessToken");
     }
-    
+
     func getAccessToken() -> String? {
         return UserDefaults.standard.string(forKey: "_accessToken")
     }
-    
+
     func removeAccessToken() -> Void{
         UserDefaults.standard.removeObject(forKey: "_accessToken")
     }
-    
+
     func getCallResult() -> [String: Any?]{
         var callResult: [String: Any] = [:];
         if(self.call != nil) {
@@ -420,30 +420,30 @@ public class TwilioVoiceFlutterPlugin: NSObject, FlutterPlugin,   NotificationDe
         callResult["status"] = self.callStatus
         return callResult;
     }
-    
+
     func incomingPushHandled() {
         if let completion = self.incomingPushCompletionCallback {
             completion()
             self.incomingPushCompletionCallback = nil
         }
     }
-    
+
     // MARK: TVONotificaitonDelegate
     public func callInviteReceived(callInvite: CallInvite) {
         NSLog("callInviteReceived:")
-        
+
         if (self.call != nil) {
             NSLog("Already an active call.");
             NSLog("  >> Ignoring call from \(String(describing: callInvite.from))");
             self.incomingPushHandled()
             return;
         }
-        
+
         self.callInvite = callInvite
         reportIncomingCall(uuid: callInvite.uuid)
     }
-    
-    
+
+
     public func cancelledCallInviteReceived(cancelledCallInvite: CancelledCallInvite, error: Error) {
         NSLog("cancelledCallInviteCanceled:")
 
@@ -451,11 +451,11 @@ public class TwilioVoiceFlutterPlugin: NSObject, FlutterPlugin,   NotificationDe
             NSLog("No matching pending CallInvite. Ignoring the Cancelled CallInvite")
             return
         }
-        
+
         performEndCallAction(uuid: self.callInvite!.uuid)
         self.incomingPushHandled()
     }
-    
+
     func callDisconnected(id: UUID, error: String?) {
         self.call = nil
         self.callInvite = nil
@@ -480,8 +480,8 @@ public class TwilioVoiceFlutterPlugin: NSObject, FlutterPlugin,   NotificationDe
         self.callKitProvider.reportCall(with: id, endedAt: Date(), reason: reason)
 
     }
-    
-    
+
+
     func isSpeaker() -> Bool{
         var speaker: Bool = false
         let currentRoute = AVAudioSession.sharedInstance().currentRoute
@@ -495,7 +495,7 @@ public class TwilioVoiceFlutterPlugin: NSObject, FlutterPlugin,   NotificationDe
         }
         return speaker
     }
-    
+
     func getFromDisplayName() -> String{
         var result: String? = nil
         if self.callInvite != nil {
@@ -503,7 +503,7 @@ public class TwilioVoiceFlutterPlugin: NSObject, FlutterPlugin,   NotificationDe
             if params?["fromDisplayName"] != nil {
                 result = params?["fromDisplayName"]
             }
-            
+
             if result == nil || result == "" {
                 let contactName = self.getContactDisplayName(phoneNumber: self.callInvite?.from ?? "")
                 if contactName != "" {
@@ -513,14 +513,14 @@ public class TwilioVoiceFlutterPlugin: NSObject, FlutterPlugin,   NotificationDe
         }else{
             result = self.fromDisplayName ?? ""
         }
-                
+
         if result == nil || result == "" {
             return "Unknown name"
         }
-        
+
         return result!
     }
-    
+
     func getToDisplayName() -> String{
         var result: String? = nil
         if self.callInvite != nil {
@@ -528,7 +528,7 @@ public class TwilioVoiceFlutterPlugin: NSObject, FlutterPlugin,   NotificationDe
             if params?["toDisplayName"] != nil {
                 result = params?["toDisplayName"]
             }
-            
+
             if result == nil {
                 let contactName = self.getContactDisplayName(phoneNumber: self.callInvite?.to ?? "")
                 if contactName != "" {
@@ -538,14 +538,14 @@ public class TwilioVoiceFlutterPlugin: NSObject, FlutterPlugin,   NotificationDe
         }else{
             result = self.toDisplayName ?? ""
         }
-                
+
         if result == nil || result == "" {
             return "Unknown name"
         }
-        
+
         return result!
     }
-    
+
     // MARK: AVAudioSession
     func toggleAudioRoute(toSpeaker: Bool) {
         // The mode set by the Voice SDK is "VoiceChat" so the default audio route is the built-in receiver. Use port override to switch the route.
@@ -563,15 +563,15 @@ public class TwilioVoiceFlutterPlugin: NSObject, FlutterPlugin,   NotificationDe
         }
         audioDevice.block()
     }
-    
-    
+
+
     // MARK: Call Kit Actions
     func performStartCallAction(uuid: UUID) {
         let toDisplayName = self.getToDisplayName()
         let callHandle = CXHandle(type: .generic, value: toDisplayName)
         let startCallAction = CXStartCallAction(call: uuid, handle: callHandle)
         let transaction = CXTransaction(action: startCallAction)
-        
+
         callKitCallController.request(transaction)  { error in
             if let error = error {
                 NSLog("StartCallAction transaction request failed: \(error.localizedDescription)")
@@ -584,9 +584,9 @@ public class TwilioVoiceFlutterPlugin: NSObject, FlutterPlugin,   NotificationDe
                 self.result = nil
                 return
             }
-            
+
             NSLog("StartCallAction transaction request successful")
-            
+
             let callUpdate = CXCallUpdate()
             callUpdate.remoteHandle = callHandle
             callUpdate.supportsDTMF = true
@@ -599,11 +599,11 @@ public class TwilioVoiceFlutterPlugin: NSObject, FlutterPlugin,   NotificationDe
             self.result?(self.getCallResult())
         }
     }
-    
+
     func reportIncomingCall(uuid: UUID) {
         let fromDisplayName = self.getFromDisplayName()
         let callHandle = CXHandle(type: .generic, value: fromDisplayName)
-        
+
         let callUpdate = CXCallUpdate()
         callUpdate.remoteHandle = callHandle
         callUpdate.supportsDTMF = true
@@ -611,7 +611,7 @@ public class TwilioVoiceFlutterPlugin: NSObject, FlutterPlugin,   NotificationDe
         callUpdate.supportsGrouping = false
         callUpdate.supportsUngrouping = false
         callUpdate.hasVideo = false
-        
+
         callKitProvider.reportNewIncomingCall(with: uuid, update: callUpdate) { error in
             if let error = error {
                 NSLog("Failed to report incoming call successfully: \(error.localizedDescription).")
@@ -620,7 +620,7 @@ public class TwilioVoiceFlutterPlugin: NSObject, FlutterPlugin,   NotificationDe
             }
         }
     }
-    
+
     func performEndCallAction(uuid: UUID) {
 
         if self.call == nil {
@@ -655,7 +655,7 @@ public class TwilioVoiceFlutterPlugin: NSObject, FlutterPlugin,   NotificationDe
 //             }
 //         }
     }
-    
+
     func performVoiceCall(uuid: UUID, completionHandler: @escaping (Bool) -> Swift.Void) {
         guard let accessToken = getAccessToken() else {
             completionHandler(false)
@@ -675,26 +675,26 @@ public class TwilioVoiceFlutterPlugin: NSObject, FlutterPlugin,   NotificationDe
             builder.params = params
             builder.uuid = uuid
         }
-                
-        call = TwilioVoice.connect(options: connectOptions, delegate: self)
+
+        call = TwilioVoiceSDK.connect(options: connectOptions, delegate: self)
         self.callKitCompletionCallback = completionHandler
     }
-    
+
     func performAnswerVoiceCall(uuid: UUID, completionHandler: @escaping (Bool) -> Swift.Void) {
-        
+
         if self.callInvite == nil {
             NSLog("No call invite")
             return
         }
-        
+
         let acceptOptions: AcceptOptions = AcceptOptions(callInvite: self.callInvite!) { (builder) in
             builder.uuid = self.callInvite?.uuid
         }
-        
+
         self.callStatus = "callConnecting"
         self.channel?.invokeMethod("callConnecting", arguments: self.getCallResult())
         call = self.callInvite!.accept(options: acceptOptions, delegate: self)
-        
+
         self.callKitCompletionCallback = completionHandler
         self.incomingPushHandled()
     }
@@ -703,31 +703,31 @@ public class TwilioVoiceFlutterPlugin: NSObject, FlutterPlugin,   NotificationDe
 
 // MARK: PKPushRegistryDelegate
 extension TwilioVoiceFlutterPlugin : PKPushRegistryDelegate {
-    
+
     public func pushRegistry(_ registry: PKPushRegistry, didUpdate credentials: PKPushCredentials, for type: PKPushType) {
         NSLog("pushRegistry:didUpdatePushCredentials:forType:")
-        
+
         if (type != .voIP) {
             return
         }
-        
+
         self.deviceTokenString = credentials.token
         let deviceToken = deviceTokenString?.reduce("", {$0 + String(format: "%02X", $1) })
         NSLog("Device token \(String(describing: deviceToken))")
     }
-    
+
     public func pushRegistry(_ registry: PKPushRegistry, didInvalidatePushTokenFor type: PKPushType) {
         NSLog("pushRegistry:didInvalidatePushTokenForType:")
-        
+
         if (type != .voIP) {
             return
         }
-        
+
         guard let deviceToken = deviceTokenString, let accessToken = getAccessToken() else {
             return
         }
-        
-        TwilioVoice.unregister(accessToken: accessToken, deviceToken: deviceToken) { (error) in
+
+        TwilioVoiceSDK.unregister(accessToken: accessToken, deviceToken: deviceToken) { (error) in
             if let error = error {
                 NSLog("An error occurred while unregistering: \(error.localizedDescription)")
             }
@@ -735,22 +735,22 @@ extension TwilioVoiceFlutterPlugin : PKPushRegistryDelegate {
                 NSLog("Successfully unregistered from VoIP push notifications.")
             }
         }
-        
+
         self.deviceTokenString = nil
     }
-    
+
     /**
      * Try using the `pushRegistry:didReceiveIncomingPushWithPayload:forType:withCompletionHandler:` method if
      * your application is targeting iOS 11. According to the docs, this delegate method is deprecated by Apple.
      */
     public func pushRegistry(_ registry: PKPushRegistry, didReceiveIncomingPushWith payload: PKPushPayload, for type: PKPushType) {
         NSLog("pushRegistry:didReceiveIncomingPushWithPayload:forType:")
-        
+
         if (type == PKPushType.voIP) {
-            TwilioVoice.handleNotification(payload.dictionaryPayload, delegate: self, delegateQueue: nil)
+            TwilioVoiceSDK.handleNotification(payload.dictionaryPayload, delegate: self, delegateQueue: nil)
         }
     }
-    
+
     /**
      * This delegate method is available on iOS 11 and above. Call the completion handler once the
      * notification payload is passed to the `TwilioVoice.handleNotification()` method.
@@ -759,9 +759,9 @@ extension TwilioVoiceFlutterPlugin : PKPushRegistryDelegate {
         NSLog("pushRegistry:didReceiveIncomingPushWithPayload:forType:completion:")
         // Save for later when the notification is properly handled.
         self.incomingPushCompletionCallback = completion
-        
+
         if (type == PKPushType.voIP) {
-            TwilioVoice.handleNotification(payload.dictionaryPayload, delegate: self, delegateQueue: nil)
+            TwilioVoiceSDK.handleNotification(payload.dictionaryPayload, delegate: self, delegateQueue: nil)
         }
     }
 }
@@ -868,7 +868,6 @@ extension TwilioVoiceFlutterPlugin : CallDelegate {
         self.callStatus = "callRinging"
         self.channel?.invokeMethod("callRinging", arguments: self.getCallResult())
     }
-    
     public func callDidConnect(call: Call) {
         NSLog("callDidConnect:")
         
